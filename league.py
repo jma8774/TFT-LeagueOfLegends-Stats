@@ -4,9 +4,9 @@ from prettytable import PrettyTable
 import requests
 import json
 
-summonerName = "scarra"
-queue_mode = 1100 # 1100 is ranked tft, 1090 is normal tft
-APIKey = "API"
+summonerName = "liliala"
+queue_mode = 1090 # 1100 is ranked tft, 1090 is normal tft
+APIKey = "RGAPI-731260d9-c48a-48bc-875d-61c2451ec335"
 
 # Summoner Info
 summonerData = requestSummonerData(summonerName, APIKey)
@@ -30,6 +30,7 @@ totalGold = 0
 totalTime = 0
 traits = {}
 units = {}
+placements = {}
 print("Please wait, receiving information from Riot API...")
 for i, value in enumerate(TFTMatchIDS):
     if i % 20 == 0:
@@ -59,6 +60,11 @@ for i, value in enumerate(TFTMatchIDS):
                         units[formatted] = 1
                     else:
                         units[formatted] += 1
+                for k, placement in enumerate(matchData['info']['participants'][j]['placement']): # retriving all placements
+                    if placement not in placements:
+                        placements[placement] = 1
+                    else:
+                        placements[placement] += 1
                 TFTMatchDatas.append(matchData)
                 break
     except Exception as err:
@@ -80,15 +86,21 @@ if n != 0: # check if there are games played
     print(statsTable)
 
     traits = sorted(traits.items(), key=lambda x: x[1], reverse=True) # printing all the traits that the summoner went for in a table
-    traitsTable = PrettyTable(['Trait', 'Data'])
+    traitsTable = PrettyTable(['Trait', 'Occurrences'])
     for i, value in enumerate(traits):
         traitsTable.add_row([value[0], value[1]])
     print(traitsTable)
 
     units = sorted(units.items(), key=lambda x: x[1], reverse=True) # printing all the units that the summoner used in a table
-    unitsTable = PrettyTable(['Unit Name', 'Data'])
+    unitsTable = PrettyTable(['Unit Name', 'Occurrences'])
     for i, value in enumerate(units):
         unitsTable.add_row([value[0], value[1]])
     print(unitsTable)
+
+    placements = sorted(placements.items(), key=lambda x: x[1], reverse=True) # printing all the placements that the summoner was placed at
+    placementsTable = PrettyTable(['Placement', 'Occurrences'])
+    for i, value in enumerate(placements):
+        placementsTable.add_row([value[0], value[1]])
+    print(placementsTable)
 else:
     print("Zero games of the game mode played")

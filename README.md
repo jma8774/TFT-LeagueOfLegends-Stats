@@ -1,1 +1,1 @@
-# TFT-LeagueOfLegends-Stats
+# League of Legends TFT Summoner Statistics

@@ -1,12 +1,12 @@
-from helper import requestSummonerData, requestTFTRankedData, requestTFTMatchIDS, requestMatchData
+from helper import requestSummonerData, requestTFTRankedData, requestTFTMatchIDS, requestMatchData, plotPie
 from time import sleep
 from prettytable import PrettyTable
 import requests
 import json
 
 summonerName = "liliala"
-queue_mode = 1090 # 1100 is ranked tft, 1090 is normal tft
-APIKey = "RGAPI-731260d9-c48a-48bc-875d-61c2451ec335"
+queue_mode = 1100 # 1100 is ranked tft, 1090 is normal tft
+APIKey = "RGAPI-078a5a84-0445-4e8c-be6a-bd999645356c"
 
 # Summoner Info
 summonerData = requestSummonerData(summonerName, APIKey)
@@ -37,11 +37,6 @@ for i, value in enumerate(TFTMatchIDS):
         sleep(1.05)
     try:
         matchData = requestMatchData(TFTMatchIDS[i], APIKey)
-        if 'metadata' not in matchData:
-            print("Rate limit exceeded, have to wait 2 minutes...")
-            sleep(121)
-            print("Continuing...")
-            matchData = requestMatchData(TFTMatchIDS[i], APIKey)
 
         for j, participants in enumerate(matchData['info']['participants']):
             if matchData['info']['participants'][j]['puuid'] == PUUID and matchData['info']['queue_id'] == queue_mode and matchData['info']['tft_set_number'] == 3:
@@ -60,11 +55,11 @@ for i, value in enumerate(TFTMatchIDS):
                         units[formatted] = 1
                     else:
                         units[formatted] += 1
-                for k, placement in enumerate(matchData['info']['participants'][j]['placement']): # retriving all placements
-                    if placement not in placements:
-                        placements[placement] = 1
-                    else:
-                        placements[placement] += 1
+                placement = matchData['info']['participants'][j]['placement'] # retriving placements for each game
+                if placement not in placements:
+                    placements[placement] = 1
+                else:
+                    placements[placement] += 1
                 TFTMatchDatas.append(matchData)
                 break
     except Exception as err:
@@ -74,9 +69,9 @@ for i, value in enumerate(TFTMatchIDS):
 n = len(TFTMatchDatas)
 print()
 if queue_mode == 1090: # specify whether this is ranked or normal
-    print(summonerName.capitalize(), "played", n, "normal games in the last 200 games of set 3 TFT, and in those games they did: (Note that I can only retrieve the most recent 200 games)")
+    print(summonerName.capitalize(), "played", n, "normal games in the last", numMatches, "games of set 3 TFT, and in those games they did: (Note that I can only retrieve the most recent 200 games)")
 elif queue_mode == 1100:
-    print(summonerName.capitalize(), "played", n, "ranked games in the last 200 games of set 3 TFT, and in those games they did: (Note that I can only retrieve the most recent 200 games)")
+    print(summonerName.capitalize(), "played", n, "ranked games in the last", numMatches, "games of set 3 TFT, and in those games they did: (Note that I can only retrieve the most recent 200 games)")
 
 if n != 0: # check if there are games played
     statsTable = PrettyTable(['Arguments', 'Data'])
@@ -97,10 +92,12 @@ if n != 0: # check if there are games played
         unitsTable.add_row([value[0], value[1]])
     print(unitsTable)
 
+
     placements = sorted(placements.items(), key=lambda x: x[1], reverse=True) # printing all the placements that the summoner was placed at
-    placementsTable = PrettyTable(['Placement', 'Occurrences'])
+    placementsTable = PrettyTable(['Placement', 'Occurrences', "Percentage"])
     for i, value in enumerate(placements):
-        placementsTable.add_row([value[0], value[1]])
+        placementsTable.add_row([value[0], value[1], ('%0.2f' % (value[1]/n * 100)) + '%'])
     print(placementsTable)
+    plotPie(placements, summonerName.capitalize() + "'s Placements Over " + str(n) + " Games")
 else:
     print("Zero games of the game mode played")

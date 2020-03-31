@@ -6,3 +6,8 @@ A personal project of mine to use the Riot Games API to fetch useful information
 >[TFT](https://na.leagueoflegends.com/en/featured/events/teamfight-tactics) is a round-based strategy game that pits you against seven opponents in a free-for-all race to build a powerful team that fights on your behalf. Your goal: Be the last person standing.
 ## What is Riot Games API?
 >The [Riot Games API](https://developer.riotgames.com/)  allows developers to access match history data, ranked leagues stats, champion and item info, and much more. 
+## Mini Showcase
+Here's a showcase of a pie chart that I worked on displaying my friend's placements.
+>The piece with the highest percentage is "exploded" from the pie
+
+![Placements](https://cdn.discordapp.com/attachments/685322747878178821/694422322966429706/unknown.png)
